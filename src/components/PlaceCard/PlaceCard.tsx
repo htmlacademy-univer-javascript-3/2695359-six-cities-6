@@ -5,9 +5,10 @@ type PlaceCardProps = {
   offer: Offer;
   onMouseEnter?: (id: string) => void;
   onMouseLeave?: () => void;
+  cardType?: 'cities' | 'favorites' | 'near-places';
 };
 
-function PlaceCard({ offer, onMouseEnter, onMouseLeave }: PlaceCardProps): JSX.Element {
+function PlaceCard({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: PlaceCardProps): JSX.Element {
   const { id, title, type, price, isFavorite, isPremium, rating, previewImage } = offer;
   const ratingPercent = `${(rating / 5) * 100}%`;
 
@@ -23,9 +24,26 @@ function PlaceCard({ offer, onMouseEnter, onMouseLeave }: PlaceCardProps): JSX.E
     }
   };
 
+  let cardClassName = 'cities__card';
+  let imageWrapperClassName = 'cities__image-wrapper';
+  let imageWidth = 260;
+  let imageHeight = 200;
+  let cardInfoClassName = '';
+
+  if (cardType === 'favorites') {
+    cardClassName = 'favorites__card';
+    imageWrapperClassName = 'favorites__image-wrapper';
+    imageWidth = 150;
+    imageHeight = 110;
+    cardInfoClassName = 'favorites__card-info';
+  } else if (cardType === 'near-places') {
+    cardClassName = 'near-places__card';
+    imageWrapperClassName = 'near-places__image-wrapper';
+  }
+
   return (
     <article
-      className="cities__card place-card"
+      className={`${cardClassName} place-card`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -34,12 +52,12 @@ function PlaceCard({ offer, onMouseEnter, onMouseLeave }: PlaceCardProps): JSX.E
           <span>Premium</span>
         </div>
       )}
-      <div className="cities__image-wrapper place-card__image-wrapper">
+      <div className={`${imageWrapperClassName} place-card__image-wrapper`}>
         <Link to={`/offer/${id}`}>
-          <img className="place-card__image" src={previewImage} width="260" height="200" alt="Place image" />
+          <img className="place-card__image" src={previewImage} width={imageWidth} height={imageHeight} alt="Place image" />
         </Link>
       </div>
-      <div className="place-card__info">
+      <div className={`${cardInfoClassName} place-card__info`}>
         <div className="place-card__price-wrapper">
           <div className="place-card__price">
             <b className="place-card__price-value">&euro;{price}</b>
