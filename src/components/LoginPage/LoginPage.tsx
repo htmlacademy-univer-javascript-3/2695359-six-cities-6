@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useMemo, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Header/Header';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -7,6 +7,12 @@ import { changeCity } from '../../store/slices/appSlice';
 import { selectAuthorizationStatus } from '../../store/selectors';
 import { CITIES, AuthorizationStatus } from '../../const';
 
+const isPasswordValid = (password: string): boolean => {
+  const hasLetter = /[a-zA-Z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  return hasLetter && hasNumber;
+};
+
 function LoginPage(): JSX.Element {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -14,6 +20,12 @@ function LoginPage(): JSX.Element {
 
   const loginRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
+  const [passwordError, setPasswordError] = useState<string>('');
+
+  const randomCity = useMemo(
+    () => CITIES[Math.floor(Math.random() * CITIES.length)],
+    []
+  );
 
   useEffect(() => {
     if (authorizationStatus === AuthorizationStatus.Auth) {
@@ -22,17 +34,24 @@ function LoginPage(): JSX.Element {
   }, [authorizationStatus, navigate]);
 
   const handleRandomCityClick = useCallback(() => {
-    const randomCity = CITIES[Math.floor(Math.random() * CITIES.length)];
     dispatch(changeCity(randomCity));
-  }, [dispatch]);
+  }, [dispatch, randomCity]);
 
   const handleSubmit = useCallback((evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
+    setPasswordError('');
 
     if (loginRef.current && passwordRef.current) {
+      const password = passwordRef.current.value;
+
+      if (!isPasswordValid(password)) {
+        setPasswordError('Password must contain at least one letter and one number');
+        return;
+      }
+
       dispatch(loginAction({
         email: loginRef.current.value,
-        password: passwordRef.current.value,
+        password,
       }));
     }
   }, [dispatch]);
@@ -67,6 +86,11 @@ function LoginPage(): JSX.Element {
                   placeholder="Password"
                   required
                 />
+                {passwordError && (
+                  <p style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                    {passwordError}
+                  </p>
+                )}
               </div>
               <button className="login__submit form__submit button" type="submit">Sign in</button>
             </form>
@@ -74,7 +98,7 @@ function LoginPage(): JSX.Element {
           <section className="locations locations--login locations--current">
             <div className="locations__item">
               <Link className="locations__item-link" to="/" onClick={handleRandomCityClick}>
-                <span>Amsterdam</span>
+                <span>{randomCity}</span>
               </Link>
             </div>
           </section>
