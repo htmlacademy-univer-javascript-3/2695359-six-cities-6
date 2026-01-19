@@ -7,16 +7,12 @@ type OffersListProps = {
 };
 
 function OffersList({ offers, onOfferHover }: OffersListProps): JSX.Element {
-  const handleCardMouseEnter = (id: string) => {
-    if (onOfferHover) {
-      onOfferHover(id);
-    }
+  const handleMouseEnter = (id: string) => {
+    onOfferHover?.(id);
   };
 
-  const handleCardMouseLeave = () => {
-    if (onOfferHover) {
-      onOfferHover(null);
-    }
+  const handleMouseLeave = () => {
+    onOfferHover?.(null);
   };
 
   return (
@@ -25,8 +21,8 @@ function OffersList({ offers, onOfferHover }: OffersListProps): JSX.Element {
         <PlaceCard
           key={offer.id}
           offer={offer}
-          onMouseEnter={handleCardMouseEnter}
-          onMouseLeave={handleCardMouseLeave}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         />
       ))}
     </div>
