@@ -1,20 +1,22 @@
-import { useState } from 'react';
 import PlaceCard from '../PlaceCard/PlaceCard';
 import { Offer } from '../../types/offer';
 
 type OffersListProps = {
   offers: Offer[];
+  onOfferHover?: (offerId: string | null) => void;
 };
 
-function OffersList({ offers }: OffersListProps): JSX.Element {
-  const [, setActiveCardId] = useState<string | null>(null);
-
+function OffersList({ offers, onOfferHover }: OffersListProps): JSX.Element {
   const handleCardMouseEnter = (id: string) => {
-    setActiveCardId(id);
+    if (onOfferHover) {
+      onOfferHover(id);
+    }
   };
 
   const handleCardMouseLeave = () => {
-    setActiveCardId(null);
+    if (onOfferHover) {
+      onOfferHover(null);
+    }
   };
 
   return (

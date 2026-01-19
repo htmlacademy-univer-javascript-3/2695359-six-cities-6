@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import OffersList from '../OffersList/OffersList';
+import Map from '../Map/Map';
 import { Offer } from '../../types/offer';
 
 type MainPageProps = {
@@ -8,6 +10,14 @@ type MainPageProps = {
 
 function MainPage({ offers }: MainPageProps): JSX.Element {
   const placesCount = offers.length;
+  const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
+
+  const handleOfferHover = (offerId: string | null) => {
+    setSelectedOfferId(offerId);
+  };
+
+  const selectedOffer = offers.find((offer) => offer.id === selectedOfferId) || null;
+  const city = offers[0]?.city;
   return (
     <div className="page page--gray page--main">
       <header className="header">
@@ -97,10 +107,10 @@ function MainPage({ offers }: MainPageProps): JSX.Element {
                   <li className="places__option" tabIndex={0}>Top rated first</li>
                 </ul>
               </form>
-              <OffersList offers={offers} />
+              <OffersList offers={offers} onOfferHover={handleOfferHover} />
             </section>
             <div className="cities__right-section">
-              <section className="cities__map map"></section>
+              {city && <Map city={city} offers={offers} selectedOffer={selectedOffer} />}
             </div>
           </div>
         </div>
