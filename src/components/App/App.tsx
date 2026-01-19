@@ -30,7 +30,7 @@ function App(): JSX.Element {
             </PrivateRoute>
           }
         />
-        <Route path="/offer/:id" element={<OfferPage offers={offers} />} />
+        <Route path="/offer/:id" element={<OfferPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

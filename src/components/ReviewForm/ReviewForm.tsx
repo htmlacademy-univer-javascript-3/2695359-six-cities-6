@@ -1,4 +1,6 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
+import { useAppDispatch } from '../../hooks';
+import { postReviewAction } from '../../store/action';
 
 const RATING_VALUES = [
   { value: 5, title: 'perfect' },
@@ -11,9 +13,15 @@ const RATING_VALUES = [
 const MIN_REVIEW_LENGTH = 50;
 const MAX_REVIEW_LENGTH = 300;
 
-function ReviewForm(): JSX.Element {
+type ReviewFormProps = {
+  offerId: string;
+};
+
+function ReviewForm({ offerId }: ReviewFormProps): JSX.Element {
+  const dispatch = useAppDispatch();
   const [rating, setRating] = useState<number>(0);
   const [review, setReview] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const isFormValid = rating > 0 && review.length >= MIN_REVIEW_LENGTH && review.length <= MAX_REVIEW_LENGTH;
 
@@ -28,9 +36,18 @@ function ReviewForm(): JSX.Element {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isFormValid) {
-      setRating(0);
-      setReview('');
+    if (isFormValid && !isSubmitting) {
+      setIsSubmitting(true);
+      dispatch(postReviewAction({ offerId, comment: review, rating }))
+        .unwrap()
+        .then(() => {
+          setRating(0);
+          setReview('');
+        })
+        .catch(() => {})
+        .finally(() => {
+          setIsSubmitting(false);
+        });
     }
   };
 
@@ -48,6 +65,7 @@ function ReviewForm(): JSX.Element {
               type="radio"
               checked={rating === value}
               onChange={handleRatingChange}
+              disabled={isSubmitting}
             />
             <label
               htmlFor={`${value}-stars`}
@@ -68,6 +86,7 @@ function ReviewForm(): JSX.Element {
         placeholder="Tell how was your stay, what you like and what can be improved"
         value={review}
         onChange={handleReviewChange}
+        disabled={isSubmitting}
       />
       <div className="reviews__button-wrapper">
         <p className="reviews__help">
@@ -76,7 +95,7 @@ function ReviewForm(): JSX.Element {
         <button
           className="reviews__submit form__submit button"
           type="submit"
-          disabled={!isFormValid}
+          disabled={!isFormValid || isSubmitting}
         >
           Submit
         </button>
