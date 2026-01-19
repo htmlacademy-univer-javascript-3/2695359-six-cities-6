@@ -5,11 +5,17 @@ import FavoritesPage from '../FavoritesPage/FavoritesPage';
 import OfferPage from '../OfferPage/OfferPage';
 import NotFoundPage from '../NotFoundPage/NotFoundPage';
 import PrivateRoute from '../PrivateRoute/PrivateRoute';
+import Spinner from '../Spinner/Spinner';
 import { useAppSelector } from '../../hooks';
 
 function App(): JSX.Element {
   const offers = useAppSelector((state) => state.offers);
+  const isOffersLoading = useAppSelector((state) => state.isOffersLoading);
   const favoriteOffers = offers.filter((offer) => offer.isFavorite);
+
+  if (isOffersLoading) {
+    return <Spinner />;
+  }
 
   return (
     <BrowserRouter>

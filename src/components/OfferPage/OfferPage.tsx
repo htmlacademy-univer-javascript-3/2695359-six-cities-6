@@ -4,7 +4,6 @@ import ReviewsList from '../ReviewsList/ReviewsList';
 import Map from '../Map/Map';
 import PlaceCard from '../PlaceCard/PlaceCard';
 import { Offer } from '../../types/offer';
-import { reviews } from '../../mocks/reviews';
 
 type OfferPageProps = {
   offers: Offer[];
@@ -175,7 +174,7 @@ function OfferPage({ offers }: OfferPageProps): JSX.Element {
                 </div>
               </div>
               <section className="offer__reviews reviews">
-                <ReviewsList reviews={reviews} />
+                <ReviewsList reviews={[]} />
                 <ReviewForm />
               </section>
             </div>
