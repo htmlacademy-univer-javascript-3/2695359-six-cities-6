@@ -5,9 +5,12 @@ import App from './components/App/App';
 import { store } from './store';
 import { fetchOffersAction } from './store/actions/offersActions';
 import { checkAuthAction } from './store/actions/userActions';
+import { fetchFavoritesAction } from './store/actions/favoritesActions';
 
 store.dispatch(fetchOffersAction());
-store.dispatch(checkAuthAction());
+store.dispatch(checkAuthAction()).then(() => {
+  store.dispatch(fetchFavoritesAction());
+});
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

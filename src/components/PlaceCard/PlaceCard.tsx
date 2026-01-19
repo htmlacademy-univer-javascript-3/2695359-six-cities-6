@@ -1,6 +1,10 @@
-import { memo, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { memo, useMemo, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Offer } from '../../types/offer';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { toggleFavoriteAction } from '../../store/actions/favoritesActions';
+import { selectAuthorizationStatus } from '../../store/selectors';
+import { AuthorizationStatus } from '../../const';
 
 type PlaceCardProps = {
   offer: Offer;
@@ -9,7 +13,10 @@ type PlaceCardProps = {
   cardType?: 'cities' | 'favorites' | 'near-places';
 };
 
-function PlaceCard({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: PlaceCardProps): JSX.Element {
+const PlaceCard = memo(({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: PlaceCardProps): JSX.Element => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const authorizationStatus = useAppSelector(selectAuthorizationStatus);
   const { id, title, type, price, isFavorite, isPremium, rating, previewImage } = offer;
 
   const ratingPercent = useMemo(() => `${(Math.round(rating) / 5) * 100}%`, [rating]);
@@ -25,6 +32,15 @@ function PlaceCard({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: P
       onMouseLeave();
     }
   };
+
+  const handleFavoriteClick = useCallback(() => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate('/login');
+      return;
+    }
+
+    dispatch(toggleFavoriteAction({ offerId: id, status: isFavorite ? 0 : 1 }));
+  }, [authorizationStatus, dispatch, id, isFavorite, navigate]);
 
   let cardClassName = 'cities__card';
   let imageWrapperClassName = 'cities__image-wrapper';
@@ -68,6 +84,7 @@ function PlaceCard({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: P
           <button
             className={`place-card__bookmark-button button ${isFavorite ? 'place-card__bookmark-button--active' : ''}`}
             type="button"
+            onClick={handleFavoriteClick}
           >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use xlinkHref="#icon-bookmark"></use>
@@ -88,6 +105,8 @@ function PlaceCard({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: P
       </div>
     </article>
   );
-}
+});
 
-export default memo(PlaceCard);
+PlaceCard.displayName = 'PlaceCard';
+
+export default PlaceCard;

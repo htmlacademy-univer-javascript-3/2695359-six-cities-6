@@ -4,6 +4,7 @@ import Map from '../Map/Map';
 import CitiesList from '../CitiesList/CitiesList';
 import SortingOptions from '../SortingOptions/SortingOptions';
 import Header from '../Header/Header';
+import MainEmpty from '../MainEmpty/MainEmpty';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { changeCity, changeSorting } from '../../store/slices/appSlice';
 import { selectCity, selectSortType, selectSortedCityOffers } from '../../store/selectors';
@@ -35,26 +36,31 @@ function MainPage(): JSX.Element {
     [offers, selectedOfferId]
   );
   const city = offers[0]?.city;
+  const isEmpty = placesCount === 0;
 
   return (
     <div className="page page--gray page--main">
       <Header />
 
-      <main className="page__main page__main--index">
+      <main className={`page__main page__main--index ${isEmpty ? 'page__main--index-empty' : ''}`}>
         <h1 className="visually-hidden">Cities</h1>
         <CitiesList currentCity={currentCity} onCityChange={handleCityChange} />
         <div className="cities">
-          <div className="cities__places-container container">
-            <section className="cities__places places">
-              <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">{placesCount} places to stay in {currentCity}</b>
-              <SortingOptions currentSort={currentSortType} onSortChange={handleSortChange} />
-              <OffersList offers={offers} onOfferHover={handleOfferHover} />
-            </section>
-            <div className="cities__right-section">
-              {city && <Map city={city} offers={offers} selectedOffer={selectedOffer} />}
+          {isEmpty ? (
+            <MainEmpty city={currentCity} />
+          ) : (
+            <div className="cities__places-container container">
+              <section className="cities__places places">
+                <h2 className="visually-hidden">Places</h2>
+                <b className="places__found">{placesCount} places to stay in {currentCity}</b>
+                <SortingOptions currentSort={currentSortType} onSortChange={handleSortChange} />
+                <OffersList offers={offers} onOfferHover={handleOfferHover} />
+              </section>
+              <div className="cities__right-section">
+                {city && <Map city={city} offers={offers} selectedOffer={selectedOffer} />}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>

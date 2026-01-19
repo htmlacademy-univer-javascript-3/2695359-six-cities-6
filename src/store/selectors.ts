@@ -27,12 +27,10 @@ export const selectSortedCityOffers = createSelector(
   (offers, sortType) => sortOffers(offers, sortType)
 );
 
-export const selectFavoriteOffers = createSelector(
-  [selectOffers],
-  (offers) => offers.filter((offer) => offer.isFavorite)
-);
+export const selectFavorites = (state: RootState) => state.favorites.favorites;
+export const selectFavoritesLoading = (state: RootState) => state.favorites.isLoading;
 
 export const selectFavoriteCount = createSelector(
-  [selectFavoriteOffers],
-  (favoriteOffers) => favoriteOffers.length
+  [selectFavorites],
+  (favorites) => favorites.length
 );
