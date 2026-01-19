@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Offer } from '../../types/offer';
 
@@ -10,7 +11,8 @@ type PlaceCardProps = {
 
 function PlaceCard({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: PlaceCardProps): JSX.Element {
   const { id, title, type, price, isFavorite, isPremium, rating, previewImage } = offer;
-  const ratingPercent = `${(Math.round(rating) / 5) * 100}%`;
+
+  const ratingPercent = useMemo(() => `${(Math.round(rating) / 5) * 100}%`, [rating]);
 
   const handleMouseEnter = () => {
     if (onMouseEnter) {
@@ -88,4 +90,4 @@ function PlaceCard({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: P
   );
 }
 
-export default PlaceCard;
+export default memo(PlaceCard);

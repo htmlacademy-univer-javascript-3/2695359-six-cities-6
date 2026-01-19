@@ -1,18 +1,19 @@
+import { memo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { logoutAction } from '../../store/action';
+import { logoutAction } from '../../store/actions/userActions';
+import { selectAuthorizationStatus, selectUser, selectFavoriteCount } from '../../store/selectors';
 import { AuthorizationStatus } from '../../const';
 
 function Header(): JSX.Element {
   const dispatch = useAppDispatch();
-  const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
-  const user = useAppSelector((state) => state.user);
-  const offers = useAppSelector((state) => state.offers);
-  const favoriteCount = offers.filter((offer) => offer.isFavorite).length;
+  const authorizationStatus = useAppSelector(selectAuthorizationStatus);
+  const user = useAppSelector(selectUser);
+  const favoriteCount = useAppSelector(selectFavoriteCount);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     dispatch(logoutAction());
-  };
+  }, [dispatch]);
 
   return (
     <header className="header">
@@ -58,4 +59,4 @@ function Header(): JSX.Element {
   );
 }
 
-export default Header;
+export default memo(Header);

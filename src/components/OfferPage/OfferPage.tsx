@@ -1,25 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import ReviewForm from '../ReviewForm/ReviewForm';
-import ReviewsList from '../ReviewsList/ReviewsList';
-import Map from '../Map/Map';
-import PlaceCard from '../PlaceCard/PlaceCard';
 import Header from '../Header/Header';
 import Spinner from '../Spinner/Spinner';
 import NotFoundPage from '../NotFoundPage/NotFoundPage';
+import ReviewsList from '../ReviewsList/ReviewsList';
+import ReviewForm from '../ReviewForm/ReviewForm';
+import Map from '../Map/Map';
+import PlaceCard from '../PlaceCard/PlaceCard';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { fetchOfferAction, fetchNearbyOffersAction, fetchReviewsAction } from '../../store/action';
+import { fetchOfferAction, fetchNearbyOffersAction } from '../../store/actions/offerActions';
+import { fetchReviewsAction } from '../../store/actions/reviewsActions';
+import { selectCurrentOffer, selectNearbyOffers, selectOfferLoading, selectAuthorizationStatus } from '../../store/selectors';
 import { AuthorizationStatus } from '../../const';
 
 function OfferPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
 
-  const currentOffer = useAppSelector((state) => state.currentOffer);
-  const nearbyOffers = useAppSelector((state) => state.nearbyOffers);
-  const reviews = useAppSelector((state) => state.reviews);
-  const isLoading = useAppSelector((state) => state.isOfferLoading);
-  const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
+  const currentOffer = useAppSelector(selectCurrentOffer);
+  const nearbyOffers = useAppSelector(selectNearbyOffers);
+  const isLoading = useAppSelector(selectOfferLoading);
+  const authorizationStatus = useAppSelector(selectAuthorizationStatus);
 
   useEffect(() => {
     if (id) {
@@ -29,6 +30,18 @@ function OfferPage(): JSX.Element {
     }
   }, [dispatch, id]);
 
+  const ratingPercent = useMemo(
+    () => currentOffer ? `${(Math.round(currentOffer.rating) / 5) * 100}%` : '0%',
+    [currentOffer]
+  );
+
+  const offersForMap = useMemo(
+    () => currentOffer ? [currentOffer, ...nearbyOffers] : nearbyOffers,
+    [currentOffer, nearbyOffers]
+  );
+
+  const handleOfferHover = useCallback(() => {}, []);
+
   if (isLoading) {
     return <Spinner />;
   }
@@ -36,9 +49,6 @@ function OfferPage(): JSX.Element {
   if (!currentOffer) {
     return <NotFoundPage />;
   }
-
-  const ratingPercent = `${(Math.round(currentOffer.rating) / 5) * 100}%`;
-  const offersForMap = [currentOffer, ...nearbyOffers];
 
   return (
     <div className="page">
@@ -127,7 +137,7 @@ function OfferPage(): JSX.Element {
                 </div>
               </div>
               <section className="offer__reviews reviews">
-                <ReviewsList reviews={reviews} />
+                <ReviewsList />
                 {authorizationStatus === AuthorizationStatus.Auth && <ReviewForm offerId={currentOffer.id} />}
               </section>
             </div>
@@ -143,7 +153,8 @@ function OfferPage(): JSX.Element {
                   key={nearbyOffer.id}
                   offer={nearbyOffer}
                   cardType="near-places"
-                  onOfferHover={() => {}}
+                  onMouseEnter={handleOfferHover}
+                  onMouseLeave={handleOfferHover}
                 />
               ))}
             </div>

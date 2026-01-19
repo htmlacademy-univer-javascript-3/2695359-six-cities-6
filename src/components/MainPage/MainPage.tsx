@@ -1,39 +1,41 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import OffersList from '../OffersList/OffersList';
 import Map from '../Map/Map';
 import CitiesList from '../CitiesList/CitiesList';
 import SortingOptions from '../SortingOptions/SortingOptions';
 import Header from '../Header/Header';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import {changeCity, changeSorting} from '../../store/action';
+import { changeCity, changeSorting } from '../../store/slices/appSlice';
+import { selectCity, selectSortType, selectSortedCityOffers } from '../../store/selectors';
 import { CityName, SortType } from '../../const';
-import { sortOffers } from '../../utils/sorting';
 
 function MainPage(): JSX.Element {
   const dispatch = useAppDispatch();
-  const currentCity = useAppSelector((state) => state.city);
-  const allOffers = useAppSelector((state) => state.offers);
-  const currentSortType = useAppSelector((state) => state.sortType);
+  const currentCity = useAppSelector(selectCity);
+  const currentSortType = useAppSelector(selectSortType);
+  const offers = useAppSelector(selectSortedCityOffers);
 
-  const cityOffers = allOffers.filter((offer) => offer.city.name === currentCity);
-  const offers = sortOffers(cityOffers, currentSortType);
-  const placesCount = offers.length;
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
 
-  const handleOfferHover = (offerId: string | null) => {
+  const handleOfferHover = useCallback((offerId: string | null) => {
     setSelectedOfferId(offerId);
-  };
+  }, []);
 
-  const handleCityChange = (city: CityName) => {
+  const handleCityChange = useCallback((city: CityName) => {
     dispatch(changeCity(city));
-  };
+  }, [dispatch]);
 
-  const handleSortChange = (sortType: SortType) => {
+  const handleSortChange = useCallback((sortType: SortType) => {
     dispatch(changeSorting(sortType));
-  };
+  }, [dispatch]);
 
-  const selectedOffer = offers.find((offer) => offer.id === selectedOfferId) || null;
+  const placesCount = offers.length;
+  const selectedOffer = useMemo(
+    () => offers.find((offer) => offer.id === selectedOfferId) || null,
+    [offers, selectedOfferId]
+  );
   const city = offers[0]?.city;
+
   return (
     <div className="page page--gray page--main">
       <Header />

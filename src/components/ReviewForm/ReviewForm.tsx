@@ -1,6 +1,7 @@
-import { useState, ChangeEvent, FormEvent } from 'react';
-import { useAppDispatch } from '../../hooks';
-import { postReviewAction } from '../../store/action';
+import { useState, ChangeEvent, FormEvent, useCallback, useMemo } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { postReviewAction } from '../../store/actions/reviewsActions';
+import { selectReviewsSubmitting } from '../../store/selectors';
 
 const RATING_VALUES = [
   { value: 5, title: 'perfect' },
@@ -19,37 +20,37 @@ type ReviewFormProps = {
 
 function ReviewForm({ offerId }: ReviewFormProps): JSX.Element {
   const dispatch = useAppDispatch();
+  const isSubmitting = useAppSelector(selectReviewsSubmitting);
+
   const [rating, setRating] = useState<number>(0);
   const [review, setReview] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const isFormValid = rating > 0 && review.length >= MIN_REVIEW_LENGTH && review.length <= MAX_REVIEW_LENGTH;
+  const isFormValid = useMemo(
+    () => rating > 0 && review.length >= MIN_REVIEW_LENGTH && review.length <= MAX_REVIEW_LENGTH,
+    [rating, review]
+  );
 
-  const handleRatingChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleRatingChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setRating(Number(event.target.value));
-  };
+  }, []);
 
-  const handleReviewChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleReviewChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
     setReview(event.target.value);
-  };
+  }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (isFormValid && !isSubmitting) {
-      setIsSubmitting(true);
       dispatch(postReviewAction({ offerId, comment: review, rating }))
         .unwrap()
         .then(() => {
           setRating(0);
           setReview('');
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsSubmitting(false);
-        });
+        .catch(() => {});
     }
-  };
+  }, [dispatch, isFormValid, isSubmitting, offerId, review, rating]);
 
   return (
     <form className="reviews__form form" action="#" method="post" onSubmit={handleSubmit}>

@@ -1,19 +1,20 @@
+import { memo, useCallback } from 'react';
 import PlaceCard from '../PlaceCard/PlaceCard';
 import { Offer } from '../../types/offer';
 
 type OffersListProps = {
   offers: Offer[];
-  onOfferHover?: (offerId: string | null) => void;
+  onOfferHover: (offerId: string | null) => void;
 };
 
 function OffersList({ offers, onOfferHover }: OffersListProps): JSX.Element {
-  const handleMouseEnter = (id: string) => {
-    onOfferHover?.(id);
-  };
+  const handleMouseEnter = useCallback((offerId: string) => {
+    onOfferHover(offerId);
+  }, [onOfferHover]);
 
-  const handleMouseLeave = () => {
-    onOfferHover?.(null);
-  };
+  const handleMouseLeave = useCallback(() => {
+    onOfferHover(null);
+  }, [onOfferHover]);
 
   return (
     <div className="cities__places-list places__list tabs__content">
@@ -23,10 +24,11 @@ function OffersList({ offers, onOfferHover }: OffersListProps): JSX.Element {
           offer={offer}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          cardType="cities"
         />
       ))}
     </div>
   );
 }
 
-export default OffersList;
+export default memo(OffersList);

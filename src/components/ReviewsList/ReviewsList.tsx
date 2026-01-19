@@ -1,16 +1,19 @@
+import { useMemo } from 'react';
 import Review from '../Review/Review';
-import { Review as ReviewType } from '../../types/review';
+import { useAppSelector } from '../../hooks';
+import { selectReviews } from '../../store/selectors';
 
 const MAX_REVIEWS_COUNT = 10;
 
-type ReviewsListProps = {
-  reviews: ReviewType[];
-};
+function ReviewsList(): JSX.Element {
+  const reviews = useAppSelector(selectReviews);
 
-function ReviewsList({ reviews }: ReviewsListProps): JSX.Element {
-  const sortedReviews = [...reviews]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, MAX_REVIEWS_COUNT);
+  const sortedReviews = useMemo(
+    () => [...reviews]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, MAX_REVIEWS_COUNT),
+    [reviews]
+  );
 
   return (
     <>

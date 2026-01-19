@@ -1,4 +1,5 @@
-import { CITIES, CityName } from '../../const';
+import { memo, useCallback } from 'react';
+import { CityName, CITIES } from '../../const';
 
 type CitiesListProps = {
   currentCity: CityName;
@@ -6,6 +7,10 @@ type CitiesListProps = {
 };
 
 function CitiesList({ currentCity, onCityChange }: CitiesListProps): JSX.Element {
+  const handleCityClick = useCallback((city: CityName) => {
+    onCityChange(city);
+  }, [onCityChange]);
+
   return (
     <div className="tabs">
       <section className="locations container">
@@ -13,11 +18,11 @@ function CitiesList({ currentCity, onCityChange }: CitiesListProps): JSX.Element
           {CITIES.map((city) => (
             <li key={city} className="locations__item">
               <a
-                className={`locations__item-link tabs__item ${city === currentCity ? 'tabs__item--active' : ''}`}
+                className={`locations__item-link tabs__item ${currentCity === city ? 'tabs__item--active' : ''}`}
                 href="#"
                 onClick={(evt) => {
                   evt.preventDefault();
-                  onCityChange(city);
+                  handleCityClick(city);
                 }}
               >
                 <span>{city}</span>
@@ -30,4 +35,4 @@ function CitiesList({ currentCity, onCityChange }: CitiesListProps): JSX.Element
   );
 }
 
-export default CitiesList;
+export default memo(CitiesList);

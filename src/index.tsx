@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import App from './components/App/App';
 import { store } from './store';
-import { fetchOffersAction, checkAuthAction } from './store/action';
+import { fetchOffersAction } from './store/actions/offersActions';
+import { checkAuthAction } from './store/actions/userActions';
 
 store.dispatch(fetchOffersAction());
 store.dispatch(checkAuthAction());

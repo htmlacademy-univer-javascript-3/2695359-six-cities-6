@@ -1,49 +1,45 @@
-import { FormEvent, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useRef, FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Header from '../Header/Header';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { changeCity, loginAction } from '../../store/action';
+import { loginAction } from '../../store/actions/userActions';
+import { changeCity } from '../../store/slices/appSlice';
+import { selectAuthorizationStatus } from '../../store/selectors';
 import { CITIES, AuthorizationStatus } from '../../const';
 
 function LoginPage(): JSX.Element {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const authorizationStatus = useAppSelector(selectAuthorizationStatus);
 
-  const randomCity = CITIES[Math.floor(Math.random() * CITIES.length)];
+  const loginRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
 
-  const handleCityClick = () => {
+  useEffect(() => {
+    if (authorizationStatus === AuthorizationStatus.Auth) {
+      navigate('/');
+    }
+  }, [authorizationStatus, navigate]);
+
+  const handleRandomCityClick = useCallback(() => {
+    const randomCity = CITIES[Math.floor(Math.random() * CITIES.length)];
     dispatch(changeCity(randomCity));
-  };
+  }, [dispatch]);
 
-  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback((evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    dispatch(loginAction({ email, password }))
-      .unwrap()
-      .then(() => {
-        navigate('/');
-      })
-      .catch(() => {});
-  };
 
-  if (authorizationStatus === AuthorizationStatus.Auth) {
-    return <Navigate to="/" />;
-  }
+    if (loginRef.current && passwordRef.current) {
+      dispatch(loginAction({
+        email: loginRef.current.value,
+        password: passwordRef.current.value,
+      }));
+    }
+  }, [dispatch]);
 
   return (
     <div className="page page--gray page--login">
-      <header className="header">
-        <div className="container">
-          <div className="header__wrapper">
-            <div className="header__left">
-              <Link className="header__logo-link" to="/">
-                <img className="header__logo" src="img/logo.svg" alt="6 cities logo" width="81" height="41" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="page__main page__main--login">
         <div className="page__login-container container">
@@ -53,25 +49,23 @@ function LoginPage(): JSX.Element {
               <div className="login__input-wrapper form__input-wrapper">
                 <label className="visually-hidden">E-mail</label>
                 <input
+                  ref={loginRef}
                   className="login__input form__input"
                   type="email"
                   name="email"
                   placeholder="Email"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="login__input-wrapper form__input-wrapper">
                 <label className="visually-hidden">Password</label>
                 <input
+                  ref={passwordRef}
                   className="login__input form__input"
                   type="password"
                   name="password"
                   placeholder="Password"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <button className="login__submit form__submit button" type="submit">Sign in</button>
@@ -79,12 +73,8 @@ function LoginPage(): JSX.Element {
           </section>
           <section className="locations locations--login locations--current">
             <div className="locations__item">
-              <Link
-                className="locations__item-link"
-                to="/"
-                onClick={handleCityClick}
-              >
-                <span>{randomCity}</span>
+              <Link className="locations__item-link" to="/" onClick={handleRandomCityClick}>
+                <span>Amsterdam</span>
               </Link>
             </div>
           </section>

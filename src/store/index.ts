@@ -1,11 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { reducer } from './reducer';
 import { createAPI } from '../services/api';
+import appReducer from './slices/appSlice';
+import offersReducer from './slices/offersSlice';
+import offerReducer from './slices/offerSlice';
+import reviewsReducer from './slices/reviewsSlice';
+import userReducer from './slices/userSlice';
 
 const api = createAPI();
 
 export const store = configureStore({
-  reducer,
+  reducer: {
+    app: appReducer,
+    offers: offersReducer,
+    offer: offerReducer,
+    reviews: reviewsReducer,
+    user: userReducer,
+  },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: {
@@ -13,3 +23,6 @@ export const store = configureStore({
       },
     }),
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

@@ -1,21 +1,23 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import PlaceCard from '../PlaceCard/PlaceCard';
 import Header from '../Header/Header';
+import PlaceCard from '../PlaceCard/PlaceCard';
+import { useAppSelector } from '../../hooks';
+import { selectFavoriteOffers } from '../../store/selectors';
 import { Offer } from '../../types/offer';
 
-type FavoritesPageProps = {
-  offers: Offer[];
-};
+function FavoritesPage(): JSX.Element {
+  const favoriteOffers = useAppSelector(selectFavoriteOffers);
 
-function FavoritesPage({ offers }: FavoritesPageProps): JSX.Element {
-  const offersByCity = offers.reduce<Record<string, Offer[]>>((acc, offer) => {
-    const cityName = offer.city.name;
-    if (!acc[cityName]) {
-      acc[cityName] = [];
-    }
-    acc[cityName].push(offer);
-    return acc;
-  }, {});
+  const offersByCity = useMemo(() =>
+    favoriteOffers.reduce<Record<string, Offer[]>>((acc, offer) => {
+      if (!acc[offer.city.name]) {
+        acc[offer.city.name] = [];
+      }
+      acc[offer.city.name].push(offer);
+      return acc;
+    }, {}), [favoriteOffers]
+  );
 
   return (
     <div className="page">
@@ -26,13 +28,13 @@ function FavoritesPage({ offers }: FavoritesPageProps): JSX.Element {
           <section className="favorites">
             <h1 className="favorites__title">Saved listing</h1>
             <ul className="favorites__list">
-              {Object.entries(offersByCity).map(([cityName, cityOffers]) => (
-                <li key={cityName} className="favorites__locations-items">
+              {Object.entries(offersByCity).map(([city, cityOffers]) => (
+                <li className="favorites__locations-items" key={city}>
                   <div className="favorites__locations locations locations--current">
                     <div className="locations__item">
-                      <a className="locations__item-link" href="#">
-                        <span>{cityName}</span>
-                      </a>
+                      <Link className="locations__item-link" to="/">
+                        <span>{city}</span>
+                      </Link>
                     </div>
                   </div>
                   <div className="favorites__places">

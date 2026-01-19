@@ -7,13 +7,14 @@ import NotFoundPage from '../NotFoundPage/NotFoundPage';
 import PrivateRoute from '../PrivateRoute/PrivateRoute';
 import Spinner from '../Spinner/Spinner';
 import { useAppSelector } from '../../hooks';
+import { selectOffersLoading, selectAuthorizationStatus } from '../../store/selectors';
+import { AuthorizationStatus } from '../../const';
 
 function App(): JSX.Element {
-  const offers = useAppSelector((state) => state.offers);
-  const isOffersLoading = useAppSelector((state) => state.isOffersLoading);
-  const favoriteOffers = offers.filter((offer) => offer.isFavorite);
+  const isOffersLoading = useAppSelector(selectOffersLoading);
+  const authorizationStatus = useAppSelector(selectAuthorizationStatus);
 
-  if (isOffersLoading) {
+  if (isOffersLoading || authorizationStatus === AuthorizationStatus.Unknown) {
     return <Spinner />;
   }
 
@@ -26,7 +27,7 @@ function App(): JSX.Element {
           path="/favorites"
           element={
             <PrivateRoute>
-              <FavoritesPage offers={favoriteOffers} />
+              <FavoritesPage />
             </PrivateRoute>
           }
         />
