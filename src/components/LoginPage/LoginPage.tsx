@@ -1,13 +1,25 @@
+import { Link } from 'react-router-dom';
+import { useAppDispatch } from '../../hooks';
+import { changeCity } from '../../store/action';
+import { CITIES } from '../../const';
+
 function LoginPage(): JSX.Element {
+  const dispatch = useAppDispatch();
+  const randomCity = CITIES[Math.floor(Math.random() * CITIES.length)];
+
+  const handleCityClick = () => {
+    dispatch(changeCity(randomCity));
+  };
+
   return (
     <div className="page page--gray page--login">
       <header className="header">
         <div className="container">
           <div className="header__wrapper">
             <div className="header__left">
-              <a className="header__logo-link" href="main.html">
+              <Link className="header__logo-link" to="/">
                 <img className="header__logo" src="img/logo.svg" alt="6 cities logo" width="81" height="41" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -31,9 +43,13 @@ function LoginPage(): JSX.Element {
           </section>
           <section className="locations locations--login locations--current">
             <div className="locations__item">
-              <a className="locations__item-link" href="#">
-                <span>Amsterdam</span>
-              </a>
+              <Link
+                className="locations__item-link"
+                to="/"
+                onClick={handleCityClick}
+              >
+                <span>{randomCity}</span>
+              </Link>
             </div>
           </section>
         </div>

@@ -18,7 +18,7 @@ function OfferPage({ offers }: OfferPageProps): JSX.Element {
     return <Navigate to="/404" replace />;
   }
 
-  const ratingPercent = `${(offer.rating / 5) * 100}%`;
+  const ratingPercent = `${(Math.round(offer.rating) / 5) * 100}%`;
   const nearbyOffers = offers.filter((item) => item.id !== id).slice(0, 3);
   const offersForMap = [...nearbyOffers, offer];
 

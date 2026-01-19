@@ -6,7 +6,7 @@ type ReviewProps = {
 
 function Review({ review }: ReviewProps): JSX.Element {
   const { comment, date, rating, user } = review;
-  const ratingPercent = `${(rating / 5) * 100}%`;
+  const ratingPercent = `${(Math.round(rating) / 5) * 100}%`;
 
   const reviewDate = new Date(date);
   const formattedDate = reviewDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });

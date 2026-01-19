@@ -10,7 +10,7 @@ type PlaceCardProps = {
 
 function PlaceCard({ offer, onMouseEnter, onMouseLeave, cardType = 'cities' }: PlaceCardProps): JSX.Element {
   const { id, title, type, price, isFavorite, isPremium, rating, previewImage } = offer;
-  const ratingPercent = `${(rating / 5) * 100}%`;
+  const ratingPercent = `${(Math.round(rating) / 5) * 100}%`;
 
   const handleMouseEnter = () => {
     if (onMouseEnter) {
