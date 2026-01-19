@@ -17,3 +17,11 @@ export const SORT_TYPES = [
   SortType.PriceHighToLow,
   SortType.TopRatedFirst,
 ] as const;
+
+export enum AuthorizationStatus {
+  Auth = 'AUTH',
+  NoAuth = 'NO_AUTH',
+  Unknown = 'UNKNOWN',
+}
+
+export const TOKEN_KEY = 'six-cities-token';
